@@ -1,76 +1,54 @@
-﻿# Transfer Teacher Curriculum Training Framework 
+# Transfer Teacher Curriculum Training Framework
 
 Compact research code for CIFAR-10 curriculum, anticurriculum, and standard training.
 
-## Requirements
+## Setup
 
 ```bash
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-## Sanity check
+## Dataset
 
-```bash
-python -m py_compile model_factory.py train.py evaluate.py scoring.py models/__init__.py
-```
+1. Download [CIFAR-10 (Python version)](https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz)
+2. Extract into `dataset/`:
+   ```bash
+   cd dataset
+   tar -xvzf cifar-10-python.tar.gz
+   ```
+3. Convert to PNG:
+   ```bash
+   python convert_cifar10.py
+   ```
 
-## Pipeline order
+This produces `dataset/train/` (50k images) and `dataset/test/` (10k images) with filenames like `00000_6_frog.png`.
 
-1. Generate difficulty-ranked CSVs:
+Our method uses index matching, so for absolute correctness the labels are embedded directly in the filenames of the raw dataset images.
 
-```bash
-python scoring.py --model-name resnet18 --seed 42 --epochs 30
-```
+## Pipeline
 
-2. Train with curriculum learning:
+1. **Score difficulty:**
+   ```bash
+   python scoring.py --model-name resnet18 --seed 42 --epochs 30
+   ```
 
-```bash
-python train.py --mode curriculum --model-name resnet18 --epochs 100 \
-  --difficulty-train-csv csv/resnet18_cifar10_100pct_seed42_20260104_100055_difficulty_ordered_train.csv \
-  --difficulty-test-csv csv/resnet18_cifar10_095243_difficulty_ordered_test.csv
-```
+2. **Train** (choose `--mode`: `curriculum`, `anticurriculum`, or `standard`):
+   ```bash
+   python train.py --mode curriculum --model-name resnet18 --epochs 100 \
+     --difficulty-train-csv csv/<train_csv> \
+     --difficulty-test-csv csv/<test_csv>
+   ```
 
-3. Train with anticurriculum learning:
+## Key Arguments
 
-```bash
-python train.py --mode anticurriculum --model-name resnet18 --epochs 100 \
-  --difficulty-train-csv csv/resnet18_cifar10_100pct_seed42_20260104_100055_difficulty_ordered_train.csv \
-  --difficulty-test-csv csv/resnet18_cifar10_095243_difficulty_ordered_test.csv
-```
-
-4. Standard baseline:
-
-```bash
-python train.py --mode standard --model-name resnet18 --epochs 100
-```
-
-## Key arguments
-
-- `--mode`: `standard`, `curriculum`, or `anticurriculum`
-- `--model-name`: `cnn`, `resnet18`, `vgg16`, `wideresnet`
-- `--epochs`, `--batch-size`, `--num-workers`, `--seed`
-- `--difficulty-train-csv`, `--difficulty-test-csv`
-- `--train-dir`, `--test-dir`
-- `--mapping-train-csv`, `--mapping-test-csv`
-- `--random-crop`, `--random-horizontal-flip`
-- `--log-dir`, `--plot-dir`, `--checkpoint-dir`, `--run-name`
-
-
-
-## Example full command
-
-```bash
-python train.py --mode curriculum --model-name resnet18 --epochs 100 \
-  --difficulty-train-csv csv/resnet18_cifar10_100pct_seed42_20260104_100055_difficulty_ordered_train.csv \
-  --difficulty-test-csv csv/resnet18_cifar10_095243_difficulty_ordered_test.csv \
-  --random-crop --random-horizontal-flip
-```
+| Argument | Options |
+|---|---|
+| `--mode` | `standard`, `curriculum`, `anticurriculum` |
+| `--model-name` | `cnn`, `resnet18`, `vgg16`, `wideresnet` |
+| `--epochs`, `--batch-size`, `--seed` | training config |
+| `--train-dir`, `--test-dir` | image directories (default: `dataset/train`, `dataset/test`) |
+| `--random-crop`, `--random-horizontal-flip` | augmentation flags |
 
 ## Output
 
-Training writes timestamped folders under `logs/`, `plots/`, and `checkpoint/` containing:
-
-- `training.log`
-- `args.json`
-- plots
-- checkpoints
+Training writes timestamped folders under `logs/`, `plots/`, and `checkpoint/`.

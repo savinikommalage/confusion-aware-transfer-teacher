@@ -182,8 +182,8 @@ def build_parser():
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--mapping-train-csv", default="csv/mapping_train.csv")
     parser.add_argument("--mapping-test-csv", default="csv/mapping_test.csv")
-    parser.add_argument("--train-images-dir", default="cifar10_raw/train")
-    parser.add_argument("--test-images-dir", default="cifar10_raw/test")
+    parser.add_argument("--train-images-dir", default="dataset/train")
+    parser.add_argument("--test-images-dir", default="dataset/test")
     parser.add_argument("--output-dir", default="csv")
     return parser
 

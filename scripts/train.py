@@ -579,8 +579,8 @@ def build_parser():
     parser.add_argument("--num-classes", type=int, default=10)
     parser.add_argument("--width-mult", type=float, default=1.0)
 
-    parser.add_argument("--train-dir", default="cifar10_raw/train")
-    parser.add_argument("--test-dir", default="cifar10_raw/test")
+    parser.add_argument("--train-dir", default="dataset/train")
+    parser.add_argument("--test-dir", default="dataset/test")
     parser.add_argument("--mapping-train-csv", default="csv/mapping_train.csv")
     parser.add_argument("--mapping-test-csv", default="csv/mapping_test.csv")
     parser.add_argument("--difficulty-train-csv", default="csv/resnet18_cifar10_100pct_seed42_20260104_100055_difficulty_ordered_train.csv")
