@@ -1,0 +1,31 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# Output directories
+logs/
+plots/
+checkpoint/
+
+# Raw dataset
+cifar10_raw/
+
+# Mac files
+.DS_Store
+
+# Misc
+*.log
