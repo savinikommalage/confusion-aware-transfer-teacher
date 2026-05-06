@@ -27,27 +27,49 @@ Our method uses index matching, so for absolute correctness the labels are embed
 
 ## Pipeline
 
-1. **Score difficulty:**
+1. **Score difficulty** — trains a teacher model and saves a checkpoint:
    ```bash
-   python scoring.py --model-name resnet18 --seed 42 --epochs 30
+   python scripts/scoring.py --model-name resnet18 --seed 42 --epochs 30
    ```
 
-2. **Train** (choose `--mode`: `curriculum`, `anticurriculum`, or `standard`):
+2. **Evaluate** — runs the saved checkpoint over the full train & test sets to produce difficulty-ordered CSVs:
    ```bash
-   python train.py --mode curriculum --model-name resnet18 --epochs 100 \
-     --difficulty-train-csv csv/<train_csv> \
-     --difficulty-test-csv csv/<test_csv>
+   python scripts/evaluate.py "scripts/checkpoint/<run_dir>/ckpt.pth" both --model-name ResNet18
+   ```
+   This saves two files to `scripts/csv/`:
+   - `<ckpt_name>_difficulty_ordered_train.csv`
+   - `<ckpt_name>_difficulty_ordered_test.csv`
+
+3. **Train** (choose `--mode`: `curriculum`, `anticurriculum`, or `standard`):
+   ```bash
+   python scripts/train.py --mode curriculum --model-name ResNet18 --epochs 100 \
+     --difficulty-train-csv csv/<ckpt_name>_difficulty_ordered_train.csv \
+     --difficulty-test-csv csv/<ckpt_name>_difficulty_ordered_test.csv
    ```
 
 ## Key Arguments
 
-| Argument | Options |
+### `train.py`
+
+| Argument | Options / Default |
 |---|---|
 | `--mode` | `standard`, `curriculum`, `anticurriculum` |
 | `--model-name` | `cnn`, `resnet18`, `vgg16`, `wideresnet` |
 | `--epochs`, `--batch-size`, `--seed` | training config |
 | `--train-dir`, `--test-dir` | image directories (default: `dataset/train`, `dataset/test`) |
+| `--difficulty-train-csv` | path to difficulty-ordered train CSV |
+| `--difficulty-test-csv` | path to difficulty-ordered test CSV |
 | `--random-crop`, `--random-horizontal-flip` | augmentation flags |
+
+### `evaluate.py`
+
+| Argument | Options / Default |
+|---|---|
+| `checkpoint` (positional) | path to `.pth` checkpoint file |
+| `dataset` (positional) | `train`, `test`, `both` (default: `both`) |
+| `--model-name` | `ResNet18` (default) |
+| `--output-dir` | output directory for CSVs (default: `csv`) |
+| `--batch-size` | `128` (default) |
 
 ## Output
 
